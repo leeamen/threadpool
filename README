@@ -1,0 +1,10 @@
+使用线程池做任务分发
+
+设计自己的callback方法
+通过MyThreadPool.DispatchTask进行调用
+
+线程池需要显示调用Destroy进行销毁
+
+详见代码
+
+

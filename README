@@ -1,10 +1,12 @@
-使用线程池做任务分发
+功能:
+    使用线程池做任务分发
 
-设计自己的callback方法
-通过MyThreadPool.DispatchTask进行调用
+使用说明:
+    设计自己的callback方法
+    通过MyThreadPool.DispatchTask进行调用
+    线程池需要显示调用Destroy进行销毁
 
-线程池需要显示调用Destroy进行销毁
-
-详见代码
+使用方式详见:
+    sample.py
 
 

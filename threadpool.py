@@ -99,6 +99,7 @@ class MyThreadPool:
 
     #线程池线程个数达到最大值并且都在使用，此时等待
     while(len(self._thread_list) <= 0 and self._total_thread_num >= self._max_thread_num):
+      logging.debug('waiting idle notify')
       self.Wait('idle')
 
     #有idle线程
@@ -222,7 +223,7 @@ class MyThread(threading.Thread):
 def process(args):
   logging.debug('the value of key 0 is :%s', args[0])
   import time
-#  time.sleep(10)
+#  time.sleep(1)
 
 if __name__ == '__main__':
 #  athread = MyThread()
@@ -231,7 +232,7 @@ if __name__ == '__main__':
 
   threadpool = MyThreadPool(10)
   i = 0
-  while i < 1:
+  while i < 1000:
     threadpool.DispatchTask(process, {0: 'lmy'})
     i+=1
 

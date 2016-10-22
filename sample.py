@@ -11,8 +11,8 @@ import threadpool as tp
 def process(args):
   logging.info('task %d is finished!', args['taskid'])
 
-threadpool = tp.MyThreadPool(10)
-for i in range(1,10000):
+threadpool = tp.MyThreadPool(2)
+for i in range(1,10):
   threadpool.DispatchTask(process, {'taskid':i})
 threadpool.Destroy()
 

@@ -6,11 +6,14 @@ import threading
 import sys
 #import time
 import logging
-logging.basicConfig(level=logging.DEBUG,
-      format='[%(asctime)s %(levelname)s] %(message)s',
-      datefmt = '%F %T')
+#logging.basicConfig(level=logging.DEBUG,
+#      format='[%(asctime)s %(msecs)d %(module)15s %(name)10s %(funcName)15s %(levelname)s] %(message)s',
+#      datefmt = '%F %T')
+#
+#logging.debug('start')
 
-logging.debug('start')
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.ERROR)
 
 
 class MyThreadPool:
@@ -34,20 +37,20 @@ class MyThreadPool:
     self._thread_list = []
 
   def __del__(self):
-    logging.debug('MyThreadPool __del__')
+    logger.debug('MyThreadPool __del__')
   def PushBack(self, athread):
     self.Lock()
 
-    logging.debug('PushBack inner')
+    logger.debug('PushBack inner')
     if not athread == None:
-      logging.debug('athread is not None')
+      logger.debug('athread is not None')
       self._thread_list.append(athread)
       self.Notify('idle')
-      logging.debug('Notify idle')
+      logger.debug('Notify idle')
 
       #全部空闲,可以结束线程池
       if len(self._thread_list) >= self._total_thread_num:
-        logging.debug('Notify full')
+        logger.debug('Notify full')
         self.Notify('full')
 
     self.UnLock()
@@ -61,33 +64,33 @@ class MyThreadPool:
       athread.join()
 
   def Destroy(self):
-    logging.debug('call Destroy')
+    logger.debug('call Destroy')
     self.Lock()
     #self._stop = True
 
     #等待线程全部工作完毕
     if len(self._thread_list) < self._total_thread_num:
       self.Wait('full')
-      logging.debug('Wait full')
+      logger.debug('Wait full')
 
     self._stop = True
-    logging.debug('self._stop = True')
+    logger.debug('self._stop = True')
 
     #通知所有线程启动
-    logging.debug('len of _thread_list is: %d',len(self._thread_list))
+    logger.debug('len of _thread_list is: %d',len(self._thread_list))
     for athread in self._thread_list:
       athread.Lock()
       athread.Notify()
       athread.UnLock()
 
-    logging.debug('通知每一个线程结束完毕')
+    logger.debug('通知每一个线程结束完毕')
 
     #
 
     if self._total_thread_num > 0:
-      logging.debug('waiting to receive empty notify')
+      logger.debug('waiting to receive empty notify')
       self.Wait('empty')
-      logging.debug('have received empty notify')
+      logger.debug('have received empty notify')
 
     self.UnLock()
 
@@ -99,7 +102,7 @@ class MyThreadPool:
 
     #线程池线程个数达到最大值并且都在使用，此时等待
     while(len(self._thread_list) <= 0 and self._total_thread_num >= self._max_thread_num):
-      logging.debug('waiting idle notify')
+      logger.debug('waiting idle notify')
       self.Wait('idle')
 
     #有idle线程
@@ -121,7 +124,7 @@ class MyThreadPool:
       athread.start()
 
     self.UnLock()
-    logging.debug('DispatchTask is over')
+    logger.debug('DispatchTask is over')
 
 
   def Stop(self):
@@ -137,7 +140,7 @@ class MyThreadPool:
     self._total_thread_num -=1
     if self._total_thread_num <= 0:
       self.Notify('empty')
-      logging.debug('send emtpy Notify')
+      logger.debug('send emtpy Notify')
     self.UnLock()
 
   def Wait(self, who):
@@ -178,7 +181,7 @@ class MyThread(threading.Thread):
     #没有使用线程池
     if self._thread_pool == None:
       self._task(self._args)
-      logging.debug('thread pool is None')
+      logger.debug('thread pool is None')
       return
     #
     while self._thread_pool.Stop() == False:
@@ -200,7 +203,7 @@ class MyThread(threading.Thread):
     #线程池停止，线程结束
     self._thread_pool.OneThreadFinish()
 
-    logging.debug('thread %d is finishing', self.ident)
+    logger.debug('thread %d is finishing', self.ident)
 
   def Lock(self):
     self._lock.acquire()
@@ -221,7 +224,7 @@ class MyThread(threading.Thread):
 
 
 def process(args):
-  logging.debug('the value of key 0 is :%s', args[0])
+  logger.debug('the value of key 0 is :%s', args[0])
   import time
 #  time.sleep(1)
 
@@ -230,14 +233,14 @@ if __name__ == '__main__':
 #  athread.SetTask(process, {0:'lmy'})
 #  athread.start()
 
-  threadpool = MyThreadPool(10)
+  threadpool = MyThreadPool(2)
   i = 0
-  while i < 1000:
+  while i < 10:
     threadpool.DispatchTask(process, {0: 'lmy'})
     i+=1
 
   threadpool.Destroy()
 
-  logging.debug('over')
+  logger.debug('over')
 
 

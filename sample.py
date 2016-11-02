@@ -1,8 +1,8 @@
 #!/usr/bin/python
 #coding:utf-8
 
-import llog
-import lthreadpool as tp
+import mylog
+import mythreadpool as tp
 import logging
 
 if __name__ == '__main__':
